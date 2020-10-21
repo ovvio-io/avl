@@ -157,17 +157,18 @@
    * @param {Key} b
    * @returns {number}
    */
-  function DEFAULT_COMPARE (a, b) { return a > b ? 1 : a < b ? -1 : 0; }
-
+  function DEFAULT_COMPARE(a, b) {
+    return a > b ? 1 : a < b ? -1 : 0;
+  }
 
   /**
    * Single left rotation
    * @param  {Node} node
    * @return {Node}
    */
-  function rotateLeft (node) {
+  function rotateLeft(node) {
     var rightNode = node.right;
-    node.right    = rightNode.left;
+    node.right = rightNode.left;
 
     if (rightNode.left) rightNode.left.parent = node;
 
@@ -180,7 +181,7 @@
       }
     }
 
-    node.parent    = rightNode;
+    node.parent = rightNode;
     rightNode.left = node;
 
     node.balanceFactor += 1;
@@ -195,8 +196,7 @@
     return rightNode;
   }
 
-
-  function rotateRight (node) {
+  function rotateRight(node) {
     var leftNode = node.left;
     node.left = leftNode.right;
     if (node.left) node.left.parent = node;
@@ -210,7 +210,7 @@
       }
     }
 
-    node.parent    = leftNode;
+    node.parent = leftNode;
     leftNode.right = node;
 
     node.balanceFactor -= 1;
@@ -226,18 +226,15 @@
     return leftNode;
   }
 
-
   // function leftBalance (node) {
   //   if (node.left.balanceFactor === -1) rotateLeft(node.left);
   //   return rotateRight(node);
   // }
 
-
   // function rightBalance (node) {
   //   if (node.right.balanceFactor === 1) rotateRight(node.right);
   //   return rotateLeft(node);
   // }
-
 
   class AVLTree {
     /**
@@ -254,13 +251,12 @@
      * @param  {comparatorCallback} [comparator]
      * @param  {boolean}            [noDuplicates=false] Disallow duplicates
      */
-    constructor (comparator, noDuplicates = false) {
+    constructor(comparator, noDuplicates = false) {
       this._comparator = comparator || DEFAULT_COMPARE;
       this._root = null;
       this._size = 0;
       this._noDuplicates = !!noDuplicates;
     }
-
 
     /**
      * Clear the tree
@@ -269,7 +265,6 @@
     destroy() {
       return this.clear();
     }
-
 
     /**
      * Clear the tree
@@ -285,30 +280,28 @@
      * Number of nodes
      * @return {number}
      */
-    get size () {
+    get size() {
       return this._size;
     }
-
 
     /**
      * Whether the tree contains a node with the given key
      * @param  {Key} key
      * @return {boolean} true/false
      */
-    contains (key) {
-      if (this._root)  {
-        var node       = this._root;
+    contains(key) {
+      if (this._root) {
+        var node = this._root;
         var comparator = this._comparator;
-        while (node)  {
+        while (node) {
           var cmp = comparator(key, node.key);
-          if      (cmp === 0) return true;
-          else if (cmp < 0)   node = node.left;
-          else                node = node.right;
+          if (cmp === 0) return true;
+          else if (cmp < 0) node = node.left;
+          else node = node.right;
         }
       }
       return false;
     }
-
 
     /* eslint-disable class-methods-use-this */
 
@@ -317,7 +310,7 @@
      * @param  {Node} node
      * @return {?Node}
      */
-    next (node) {
+    next(node) {
       var successor = node;
       if (successor) {
         if (successor.right) {
@@ -326,20 +319,20 @@
         } else {
           successor = node.parent;
           while (successor && successor.right === node) {
-            node = successor; successor = successor.parent;
+            node = successor;
+            successor = successor.parent;
           }
         }
       }
       return successor;
     }
 
-
     /**
      * Predecessor node
      * @param  {Node} node
      * @return {?Node}
      */
-    prev (node) {
+    prev(node) {
       var predecessor = node;
       if (predecessor) {
         if (predecessor.left) {
@@ -357,7 +350,6 @@
     }
     /* eslint-enable class-methods-use-this */
 
-
     /**
      * Callback for forEach
      * @callback forEachCallback
@@ -371,7 +363,9 @@
      */
     forEach(callback) {
       var current = this._root;
-      var s = [], done = false, i = 0;
+      var s = [],
+        done = false,
+        i = 0;
 
       while (!done) {
         // Reach the left most Node of the current Node
@@ -397,7 +391,6 @@
       return this;
     }
 
-
     /**
      * Walk key range from `low` to `high`. Stops if `fn` returns a value.
      * @param  {Key}      low
@@ -409,7 +402,8 @@
     range(low, high, fn, ctx) {
       const Q = [];
       const compare = this._comparator;
-      let node = this._root, cmp;
+      let node = this._root,
+        cmp;
 
       while (Q.length !== 0 || node) {
         if (node) {
@@ -429,14 +423,47 @@
       return this;
     }
 
+    /**
+     * Walk key range from `high` to `low`. Stops if `fn` returns a value.
+     * @param  {Key}      high
+     * @param  {Key}      low
+     * @param  {Function} fn
+     * @param  {*?}       ctx
+     * @return {SplayTree}
+     */
+    rangeRev(high, low, fn, ctx) {
+      const Q = [];
+      const compare = this._comparator;
+      let node = this._root,
+        cmp;
+
+      while (Q.length !== 0 || node) {
+        if (node) {
+          Q.push(node);
+          node = node.right;
+        } else {
+          node = Q.pop();
+          cmp = compare(node.key, low);
+          if (cmp < 0) {
+            break;
+          } else if (compare(node.key, high) <= 0) {
+            if (fn.call(ctx, node)) return this; // stop if smth is returned
+          }
+          node = node.left;
+        }
+      }
+      return this;
+    }
 
     /**
      * Returns all keys in order
      * @return {Array<Key>}
      */
-    keys () {
+    keys() {
       var current = this._root;
-      var s = [], r = [], done = false;
+      var s = [],
+        r = [],
+        done = false;
 
       while (!done) {
         if (current) {
@@ -453,14 +480,15 @@
       return r;
     }
 
-
     /**
      * Returns `data` fields of all nodes in order.
      * @return {Array<Value>}
      */
-    values () {
+    values() {
       var current = this._root;
-      var s = [], r = [], done = false;
+      var s = [],
+        r = [],
+        done = false;
 
       while (!done) {
         if (current) {
@@ -477,19 +505,20 @@
       return r;
     }
 
-
     /**
      * Returns node at given index
      * @param  {number} index
      * @return {?Node}
      */
-    at (index) {
+    at(index) {
       // removed after a consideration, more misleading than useful
       // index = index % this.size;
       // if (index < 0) index = this.size - index;
 
       var current = this._root;
-      var s = [], done = false, i = 0;
+      var s = [],
+        done = false,
+        i = 0;
 
       while (!done) {
         if (current) {
@@ -507,54 +536,49 @@
       return null;
     }
 
-
     /**
      * Returns node with the minimum key
      * @return {?Node}
      */
-    minNode () {
+    minNode() {
       var node = this._root;
       if (!node) return null;
       while (node.left) node = node.left;
       return node;
     }
-
 
     /**
      * Returns node with the max key
      * @return {?Node}
      */
-    maxNode () {
+    maxNode() {
       var node = this._root;
       if (!node) return null;
       while (node.right) node = node.right;
       return node;
     }
 
-
     /**
      * Min key
      * @return {?Key}
      */
-    min () {
+    min() {
       var node = this._root;
       if (!node) return null;
       while (node.left) node = node.left;
       return node.key;
     }
 
-
     /**
      * Max key
      * @return {?Key}
      */
-    max () {
+    max() {
       var node = this._root;
       if (!node) return null;
       while (node.right) node = node.right;
       return node.key;
     }
-
 
     /**
      * @return {boolean} true/false
@@ -563,13 +587,13 @@
       return !this._root;
     }
 
-
     /**
      * Removes and returns the node with smallest key
      * @return {?Node}
      */
-    pop () {
-      var node = this._root, returnValue = null;
+    pop() {
+      var node = this._root,
+        returnValue = null;
       if (node) {
         while (node.left) node = node.left;
         returnValue = { key: node.key, data: node.data };
@@ -578,13 +602,13 @@
       return returnValue;
     }
 
-
     /**
      * Removes and returns the node with highest key
      * @return {?Node}
      */
-    popMax () {
-      var node = this._root, returnValue = null;
+    popMax() {
+      var node = this._root,
+        returnValue = null;
       if (node) {
         while (node.right) node = node.right;
         returnValue = { key: node.key, data: node.data };
@@ -593,29 +617,28 @@
       return returnValue;
     }
 
-
     /**
      * Find node by key
      * @param  {Key} key
      * @return {?Node}
      */
-    find (key) {
+    find(key) {
       var root = this._root;
       // if (root === null)    return null;
       // if (key === root.key) return root;
 
-      var subtree = root, cmp;
+      var subtree = root,
+        cmp;
       var compare = this._comparator;
       while (subtree) {
         cmp = compare(key, subtree.key);
-        if      (cmp === 0) return subtree;
-        else if (cmp < 0)   subtree = subtree.left;
-        else                subtree = subtree.right;
+        if (cmp === 0) return subtree;
+        else if (cmp < 0) subtree = subtree.left;
+        else subtree = subtree.right;
       }
 
       return null;
     }
-
 
     /**
      * Insert a node into the tree
@@ -623,35 +646,40 @@
      * @param  {Value} [data]
      * @return {?Node}
      */
-    insert (key, data) {
+    insert(key, data) {
       if (!this._root) {
         this._root = {
-          parent: null, left: null, right: null, balanceFactor: 0,
-          key, data
+          parent: null,
+          left: null,
+          right: null,
+          balanceFactor: 0,
+          key,
+          data,
         };
         this._size++;
         return this._root;
       }
 
       var compare = this._comparator;
-      var node    = this._root;
-      var parent  = null;
-      var cmp     = 0;
+      var node = this._root;
+      var parent = null;
+      var cmp = 0;
 
       if (this._noDuplicates) {
         while (node) {
           cmp = compare(key, node.key);
           parent = node;
-          if      (cmp === 0) return null;
-          else if (cmp < 0)   node = node.left;
-          else                node = node.right;
+          if (cmp === 0) return null;
+          else if (cmp < 0) node = node.left;
+          else node = node.right;
         }
       } else {
         while (node) {
           cmp = compare(key, node.key);
           parent = node;
-          if      (cmp <= 0)  node = node.left; //return null;
-          else                node = node.right;
+          if (cmp <= 0) node = node.left;
+          //return null;
+          else node = node.right;
         }
       }
 
@@ -659,19 +687,21 @@
         left: null,
         right: null,
         balanceFactor: 0,
-        parent, key, data
+        parent,
+        key,
+        data,
       };
       var newRoot;
-      if (cmp <= 0) parent.left  = newNode;
-      else         parent.right = newNode;
+      if (cmp <= 0) parent.left = newNode;
+      else parent.right = newNode;
 
       while (parent) {
         cmp = compare(parent.key, key);
         if (cmp < 0) parent.balanceFactor -= 1;
-        else         parent.balanceFactor += 1;
+        else parent.balanceFactor += 1;
 
-        if        (parent.balanceFactor === 0) break;
-        else if   (parent.balanceFactor < -1) {
+        if (parent.balanceFactor === 0) break;
+        else if (parent.balanceFactor < -1) {
           // inlined
           //var newRoot = rightBalance(parent);
           if (parent.right.balanceFactor === 1) rotateRight(parent.right);
@@ -695,13 +725,12 @@
       return newNode;
     }
 
-
     /**
      * Removes the node from the tree. If not found, returns null.
      * @param  {Key} key
      * @return {?Node}
      */
-    remove (key) {
+    remove(key) {
       if (!this._root) return null;
 
       var node = this._root;
@@ -710,9 +739,9 @@
 
       while (node) {
         cmp = compare(key, node.key);
-        if      (cmp === 0) break;
-        else if (cmp < 0)   node = node.left;
-        else                node = node.right;
+        if (cmp === 0) break;
+        else if (cmp < 0) node = node.left;
+        else node = node.right;
       }
       if (!node) return null;
 
@@ -733,7 +762,7 @@
           }
         }
 
-        node.key  = max.key;
+        node.key = max.key;
         node.data = max.data;
         node = max;
       }
@@ -744,7 +773,7 @@
         while (min.left || min.right) {
           while (min.left) min = min.left;
 
-          node.key  = min.key;
+          node.key = min.key;
           node.data = min.data;
           if (min.right) {
             node = min;
@@ -752,20 +781,20 @@
           }
         }
 
-        node.key  = min.key;
+        node.key = min.key;
         node.data = min.data;
         node = min;
       }
 
       var parent = node.parent;
-      var pp     = node;
+      var pp = node;
       var newRoot;
 
       while (parent) {
         if (parent.left === pp) parent.balanceFactor -= 1;
-        else                    parent.balanceFactor += 1;
+        else parent.balanceFactor += 1;
 
-        if        (parent.balanceFactor < -1) {
+        if (parent.balanceFactor < -1) {
           // inlined
           //var newRoot = rightBalance(parent);
           if (parent.right.balanceFactor === 1) rotateRight(parent.right);
@@ -785,13 +814,13 @@
 
         if (parent.balanceFactor === -1 || parent.balanceFactor === 1) break;
 
-        pp     = parent;
+        pp = parent;
         parent = parent.parent;
       }
 
       if (node.parent) {
-        if (node.parent.left === node) node.parent.left  = null;
-        else                           node.parent.right = null;
+        if (node.parent.left === node) node.parent.left = null;
+        else node.parent.right = null;
       }
 
       if (node === this._root) this._root = null;
@@ -800,7 +829,6 @@
       return returnValue;
     }
 
-
     /**
      * Bulk-load items
      * @param  {Array<Key>}  keys
@@ -808,7 +836,7 @@
      * @return {AVLTree}
      */
     load(keys = [], values = [], presort) {
-      if (this._size !== 0) throw new Error('bulk-load: tree is not empty');
+      if (this._size !== 0) throw new Error("bulk-load: tree is not empty");
       const size = keys.length;
       if (presort) sort(keys, values, 0, size - 1, this._comparator);
       this._root = loadRecursive(null, keys, values, 0, size);
@@ -816,7 +844,6 @@
       this._size = size;
       return this;
     }
-
 
     /**
      * Returns true if the tree is balanced
@@ -826,13 +853,12 @@
       return isBalanced(this._root);
     }
 
-
     /**
      * String representation of the tree - primitive horizontal print-out
      * @param  {Function(Node):string} [printNode]
      * @return {string}
      */
-    toString (printNode) {
+    toString(printNode) {
       return print(this._root, printNode);
     }
   }

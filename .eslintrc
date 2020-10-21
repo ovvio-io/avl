@@ -8,7 +8,7 @@
     "object-curly-newline": 0,
     "no-else-return": 0,
     "prefer-destructuring": 0,
-    "operator-linebreak": 0,
+    //"operator-linebreak": 0,
     "import/prefer-default-export": 0,
     "import/no-extraneous-dependencies": 0,
     "import/no-unresolved": 0,
@@ -39,7 +39,7 @@
     "no-var": 0,
     "vars-on-top": 0,
     "no-lonely-if": 0,
-    template-curly-spacing: 0,
-    object-property-newline: 0
+    "template-curly-spacing": 0,
+    "object-property-newline": 0
   }
 }

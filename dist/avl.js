@@ -159,17 +159,18 @@
    * @param {Key} b
    * @returns {number}
    */
-  function DEFAULT_COMPARE (a, b) { return a > b ? 1 : a < b ? -1 : 0; }
-
+  function DEFAULT_COMPARE(a, b) {
+    return a > b ? 1 : a < b ? -1 : 0;
+  }
 
   /**
    * Single left rotation
    * @param  {Node} node
    * @return {Node}
    */
-  function rotateLeft (node) {
+  function rotateLeft(node) {
     var rightNode = node.right;
-    node.right    = rightNode.left;
+    node.right = rightNode.left;
 
     if (rightNode.left) { rightNode.left.parent = node; }
 
@@ -182,7 +183,7 @@
       }
     }
 
-    node.parent    = rightNode;
+    node.parent = rightNode;
     rightNode.left = node;
 
     node.balanceFactor += 1;
@@ -197,8 +198,7 @@
     return rightNode;
   }
 
-
-  function rotateRight (node) {
+  function rotateRight(node) {
     var leftNode = node.left;
     node.left = leftNode.right;
     if (node.left) { node.left.parent = node; }
@@ -212,7 +212,7 @@
       }
     }
 
-    node.parent    = leftNode;
+    node.parent = leftNode;
     leftNode.right = node;
 
     node.balanceFactor -= 1;
@@ -228,20 +228,17 @@
     return leftNode;
   }
 
-
   // function leftBalance (node) {
   //   if (node.left.balanceFactor === -1) rotateLeft(node.left);
   //   return rotateRight(node);
   // }
-
 
   // function rightBalance (node) {
   //   if (node.right.balanceFactor === 1) rotateRight(node.right);
   //   return rotateLeft(node);
   // }
 
-
-  var AVLTree = function AVLTree (comparator, noDuplicates) {
+  var AVLTree = function AVLTree(comparator, noDuplicates) {
     if ( noDuplicates === void 0 ) noDuplicates = false;
 
     this._comparator = comparator || DEFAULT_COMPARE;
@@ -252,7 +249,6 @@
 
   var prototypeAccessors = { size: { configurable: true } };
 
-
   /**
    * Clear the tree
    * @return {AVLTree}
@@ -260,7 +256,6 @@
   AVLTree.prototype.destroy = function destroy () {
     return this.clear();
   };
-
 
   /**
    * Clear the tree
@@ -280,26 +275,24 @@
     return this._size;
   };
 
-
   /**
    * Whether the tree contains a node with the given key
    * @param{Key} key
    * @return {boolean} true/false
    */
   AVLTree.prototype.contains = function contains (key) {
-    if (this._root){
-      var node     = this._root;
+    if (this._root) {
+      var node = this._root;
       var comparator = this._comparator;
-      while (node){
+      while (node) {
         var cmp = comparator(key, node.key);
-        if    (cmp === 0) { return true; }
+        if (cmp === 0) { return true; }
         else if (cmp < 0) { node = node.left; }
-        else              { node = node.right; }
+        else { node = node.right; }
       }
     }
     return false;
   };
-
 
   /* eslint-disable class-methods-use-this */
 
@@ -317,13 +310,13 @@
       } else {
         successor = node.parent;
         while (successor && successor.right === node) {
-          node = successor; successor = successor.parent;
+          node = successor;
+          successor = successor.parent;
         }
       }
     }
     return successor;
   };
-
 
   /**
    * Predecessor node
@@ -348,7 +341,6 @@
   };
   /* eslint-enable class-methods-use-this */
 
-
   /**
    * Callback for forEach
    * @callback forEachCallback
@@ -362,7 +354,9 @@
    */
   AVLTree.prototype.forEach = function forEach (callback) {
     var current = this._root;
-    var s = [], done = false, i = 0;
+    var s = [],
+      done = false,
+      i = 0;
 
     while (!done) {
       // Reach the left most Node of the current Node
@@ -388,7 +382,6 @@
     return this;
   };
 
-
   /**
    * Walk key range from `low` to `high`. Stops if `fn` returns a value.
    * @param{Key}    low
@@ -402,7 +395,8 @@
 
     var Q = [];
     var compare = this._comparator;
-    var node = this._root, cmp;
+    var node = this._root,
+      cmp;
 
     while (Q.length !== 0 || node) {
       if (node) {
@@ -422,6 +416,39 @@
     return this;
   };
 
+  /**
+   * Walk key range from `high` to `low`. Stops if `fn` returns a value.
+   * @param{Key}    high
+   * @param{Key}    low
+   * @param{Function} fn
+   * @param{*?}     ctx
+   * @return {SplayTree}
+   */
+  AVLTree.prototype.rangeRev = function rangeRev (high, low, fn, ctx) {
+      var this$1 = this;
+
+    var Q = [];
+    var compare = this._comparator;
+    var node = this._root,
+      cmp;
+
+    while (Q.length !== 0 || node) {
+      if (node) {
+        Q.push(node);
+        node = node.right;
+      } else {
+        node = Q.pop();
+        cmp = compare(node.key, low);
+        if (cmp < 0) {
+          break;
+        } else if (compare(node.key, high) <= 0) {
+          if (fn.call(ctx, node)) { return this$1; } // stop if smth is returned
+        }
+        node = node.left;
+      }
+    }
+    return this;
+  };
 
   /**
    * Returns all keys in order
@@ -429,7 +456,9 @@
    */
   AVLTree.prototype.keys = function keys () {
     var current = this._root;
-    var s = [], r = [], done = false;
+    var s = [],
+      r = [],
+      done = false;
 
     while (!done) {
       if (current) {
@@ -446,14 +475,15 @@
     return r;
   };
 
-
   /**
    * Returns `data` fields of all nodes in order.
    * @return {Array<Value>}
    */
   AVLTree.prototype.values = function values () {
     var current = this._root;
-    var s = [], r = [], done = false;
+    var s = [],
+      r = [],
+      done = false;
 
     while (!done) {
       if (current) {
@@ -470,7 +500,6 @@
     return r;
   };
 
-
   /**
    * Returns node at given index
    * @param{number} index
@@ -482,7 +511,9 @@
     // if (index < 0) index = this.size - index;
 
     var current = this._root;
-    var s = [], done = false, i = 0;
+    var s = [],
+      done = false,
+      i = 0;
 
     while (!done) {
       if (current) {
@@ -500,7 +531,6 @@
     return null;
   };
 
-
   /**
    * Returns node with the minimum key
    * @return {?Node}
@@ -511,7 +541,6 @@
     while (node.left) { node = node.left; }
     return node;
   };
-
 
   /**
    * Returns node with the max key
@@ -524,7 +553,6 @@
     return node;
   };
 
-
   /**
    * Min key
    * @return {?Key}
@@ -535,7 +563,6 @@
     while (node.left) { node = node.left; }
     return node.key;
   };
-
 
   /**
    * Max key
@@ -548,7 +575,6 @@
     return node.key;
   };
 
-
   /**
    * @return {boolean} true/false
    */
@@ -556,13 +582,13 @@
     return !this._root;
   };
 
-
   /**
    * Removes and returns the node with smallest key
    * @return {?Node}
    */
   AVLTree.prototype.pop = function pop () {
-    var node = this._root, returnValue = null;
+    var node = this._root,
+      returnValue = null;
     if (node) {
       while (node.left) { node = node.left; }
       returnValue = { key: node.key, data: node.data };
@@ -571,13 +597,13 @@
     return returnValue;
   };
 
-
   /**
    * Removes and returns the node with highest key
    * @return {?Node}
    */
   AVLTree.prototype.popMax = function popMax () {
-    var node = this._root, returnValue = null;
+    var node = this._root,
+      returnValue = null;
     if (node) {
       while (node.right) { node = node.right; }
       returnValue = { key: node.key, data: node.data };
@@ -585,7 +611,6 @@
     }
     return returnValue;
   };
-
 
   /**
    * Find node by key
@@ -597,18 +622,18 @@
     // if (root === null)  return null;
     // if (key === root.key) return root;
 
-    var subtree = root, cmp;
+    var subtree = root,
+      cmp;
     var compare = this._comparator;
     while (subtree) {
       cmp = compare(key, subtree.key);
-      if    (cmp === 0) { return subtree; }
+      if (cmp === 0) { return subtree; }
       else if (cmp < 0) { subtree = subtree.left; }
-      else              { subtree = subtree.right; }
+      else { subtree = subtree.right; }
     }
 
     return null;
   };
-
 
   /**
    * Insert a node into the tree
@@ -621,32 +646,37 @@
 
     if (!this._root) {
       this._root = {
-        parent: null, left: null, right: null, balanceFactor: 0,
-        key: key, data: data
+        parent: null,
+        left: null,
+        right: null,
+        balanceFactor: 0,
+        key: key,
+        data: data,
       };
       this._size++;
       return this._root;
     }
 
     var compare = this._comparator;
-    var node  = this._root;
-    var parent= null;
-    var cmp   = 0;
+    var node = this._root;
+    var parent = null;
+    var cmp = 0;
 
     if (this._noDuplicates) {
       while (node) {
         cmp = compare(key, node.key);
         parent = node;
-        if    (cmp === 0) { return null; }
+        if (cmp === 0) { return null; }
         else if (cmp < 0) { node = node.left; }
-        else              { node = node.right; }
+        else { node = node.right; }
       }
     } else {
       while (node) {
         cmp = compare(key, node.key);
         parent = node;
-        if    (cmp <= 0){ node = node.left; } //return null;
-        else              { node = node.right; }
+        if (cmp <= 0) { node = node.left; }
+        //return null;
+        else { node = node.right; }
       }
     }
 
@@ -654,18 +684,20 @@
       left: null,
       right: null,
       balanceFactor: 0,
-      parent: parent, key: key, data: data
+      parent: parent,
+      key: key,
+      data: data,
     };
     var newRoot;
-    if (cmp <= 0) { parent.left= newNode; }
-    else       { parent.right = newNode; }
+    if (cmp <= 0) { parent.left = newNode; }
+    else { parent.right = newNode; }
 
     while (parent) {
       cmp = compare(parent.key, key);
       if (cmp < 0) { parent.balanceFactor -= 1; }
-      else       { parent.balanceFactor += 1; }
+      else { parent.balanceFactor += 1; }
 
-      if      (parent.balanceFactor === 0) { break; }
+      if (parent.balanceFactor === 0) { break; }
       else if (parent.balanceFactor < -1) {
         // inlined
         //var newRoot = rightBalance(parent);
@@ -690,7 +722,6 @@
     return newNode;
   };
 
-
   /**
    * Removes the node from the tree. If not found, returns null.
    * @param{Key} key
@@ -707,9 +738,9 @@
 
     while (node) {
       cmp = compare(key, node.key);
-      if    (cmp === 0) { break; }
+      if (cmp === 0) { break; }
       else if (cmp < 0) { node = node.left; }
-      else              { node = node.right; }
+      else { node = node.right; }
     }
     if (!node) { return null; }
 
@@ -730,7 +761,7 @@
         }
       }
 
-      node.key= max.key;
+      node.key = max.key;
       node.data = max.data;
       node = max;
     }
@@ -741,7 +772,7 @@
       while (min.left || min.right) {
         while (min.left) { min = min.left; }
 
-        node.key= min.key;
+        node.key = min.key;
         node.data = min.data;
         if (min.right) {
           node = min;
@@ -749,20 +780,20 @@
         }
       }
 
-      node.key= min.key;
+      node.key = min.key;
       node.data = min.data;
       node = min;
     }
 
     var parent = node.parent;
-    var pp   = node;
+    var pp = node;
     var newRoot;
 
     while (parent) {
       if (parent.left === pp) { parent.balanceFactor -= 1; }
-      else                  { parent.balanceFactor += 1; }
+      else { parent.balanceFactor += 1; }
 
-      if      (parent.balanceFactor < -1) {
+      if (parent.balanceFactor < -1) {
         // inlined
         //var newRoot = rightBalance(parent);
         if (parent.right.balanceFactor === 1) { rotateRight(parent.right); }
@@ -782,13 +813,13 @@
 
       if (parent.balanceFactor === -1 || parent.balanceFactor === 1) { break; }
 
-      pp   = parent;
+      pp = parent;
       parent = parent.parent;
     }
 
     if (node.parent) {
-      if (node.parent.left === node) { node.parent.left= null; }
-      else                         { node.parent.right = null; }
+      if (node.parent.left === node) { node.parent.left = null; }
+      else { node.parent.right = null; }
     }
 
     if (node === this._root) { this._root = null; }
@@ -796,7 +827,6 @@
     this._size--;
     return returnValue;
   };
-
 
   /**
    * Bulk-load items
@@ -808,7 +838,7 @@
       if ( keys === void 0 ) keys = [];
       if ( values === void 0 ) values = [];
 
-    if (this._size !== 0) { throw new Error('bulk-load: tree is not empty'); }
+    if (this._size !== 0) { throw new Error("bulk-load: tree is not empty"); }
     var size = keys.length;
     if (presort) { sort(keys, values, 0, size - 1, this._comparator); }
     this._root = loadRecursive(null, keys, values, 0, size);
@@ -817,7 +847,6 @@
     return this;
   };
 
-
   /**
    * Returns true if the tree is balanced
    * @return {boolean}
@@ -825,7 +854,6 @@
   AVLTree.prototype.isBalanced = function isBalanced$1 () {
     return isBalanced(this._root);
   };
-
 
   /**
    * String representation of the tree - primitive horizontal print-out
