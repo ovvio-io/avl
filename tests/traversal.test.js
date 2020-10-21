@@ -1,11 +1,10 @@
-import { describe, it } from 'mocha';
-import { assert }       from 'chai';
+import { describe, it } from "mocha";
+import { assert } from "chai";
 
-import Tree from '../src/index';
+import Tree from "../src/index";
 
-describe('traversal check', () => {
-
-  it ('should traverse the tree in order', () => {
+describe("traversal check", () => {
+  it("should traverse the tree in order", () => {
     const tree = new Tree();
     tree.insert(3);
     tree.insert(1);
@@ -15,7 +14,7 @@ describe('traversal check', () => {
     tree.forEach((n, i) => assert.equal(n.key, i));
   });
 
-  it('should find predecessor for the node', () => {
+  it("should find predecessor for the node", () => {
     const tree = new Tree();
     const keys = [];
     for (let i = 0; i < 10; i++) tree.insert(i);
@@ -25,7 +24,7 @@ describe('traversal check', () => {
     }
   });
 
-  it('should find successor for a node', () => {
+  it("should find successor for a node", () => {
     const tree = new Tree();
     for (let i = 0; i < 10; i++) tree.insert(i);
 
@@ -34,7 +33,7 @@ describe('traversal check', () => {
     }
   });
 
-  it('should return null for predecessor of the min node', () => {
+  it("should return null for predecessor of the min node", () => {
     const tree = new Tree();
     for (let i = 0; i < 10; i++) tree.insert(i);
 
@@ -45,7 +44,7 @@ describe('traversal check', () => {
     assert.isNull(tree.prev(min));
   });
 
-  it('should return null for successor of the max node', () => {
+  it("should return null for successor of the max node", () => {
     const tree = new Tree();
     for (let i = 0; i < 10; i++) tree.insert(i);
 
@@ -56,9 +55,10 @@ describe('traversal check', () => {
     assert.isNull(tree.next(max));
   });
 
-  it ('should find successor and predecessor for 2-nodes tree', () => {
+  it("should find successor and predecessor for 2-nodes tree", () => {
     const tree = new Tree();
-    tree.insert(5); tree.insert(10);
+    tree.insert(5);
+    tree.insert(10);
 
     let min = tree.minNode();
     assert.equal(min.key, 5);
@@ -71,7 +71,7 @@ describe('traversal check', () => {
     assert.equal(tree.prev(max).key, 5);
   });
 
-  it ('should be able to get a node by its index', () => {
+  it("should be able to get a node by its index", () => {
     const tree = new Tree();
     for (let i = 0; i < 10; i++) tree.insert(i);
 
@@ -79,10 +79,10 @@ describe('traversal check', () => {
 
     assert.isNull(tree.at(10));
     assert.isNull(tree.at(-1));
-    assert.isNull(tree.at('a'));
+    assert.isNull(tree.at("a"));
   });
 
-  it ('should support range walking', () => {
+  it("should support range walking", () => {
     const tree = new Tree();
     for (let i = 0; i < 10; i++) tree.insert(i);
 
@@ -90,34 +90,45 @@ describe('traversal check', () => {
     tree.range(3, 8, (n) => {
       arr.push(n.key);
     });
-    assert.deepEqual(arr, [3,4,5,6,7,8]);
+    assert.deepEqual(arr, [3, 4, 5, 6, 7, 8]);
   });
 
-  it ('should support range walking with non-existent low key', () => {
+  it("should support range-rev walking", () => {
     const tree = new Tree();
     for (let i = 0; i < 10; i++) tree.insert(i);
 
     const arr = [];
-    tree.range(-3,5, (n) => {
+    tree.rangeRev(8, 3, (n) => {
       arr.push(n.key);
     });
-
-    assert.deepEqual(arr, [0,1,2,3,4,5]);
+    assert.deepEqual(arr, [8, 7, 6, 5, 4, 3]);
   });
 
-  it ('should support range walking with non-existent high key', () => {
+  it("should support range walking with non-existent low key", () => {
     const tree = new Tree();
     for (let i = 0; i < 10; i++) tree.insert(i);
 
     const arr = [];
-    tree.range(3,15, (n) => {
+    tree.range(-3, 5, (n) => {
       arr.push(n.key);
     });
 
-    assert.deepEqual(arr, [3,4,5,6,7,8,9]);
+    assert.deepEqual(arr, [0, 1, 2, 3, 4, 5]);
   });
 
-  it ('should support range walking with both keys out of range', () => {
+  it("should support range walking with non-existent high key", () => {
+    const tree = new Tree();
+    for (let i = 0; i < 10; i++) tree.insert(i);
+
+    const arr = [];
+    tree.range(3, 15, (n) => {
+      arr.push(n.key);
+    });
+
+    assert.deepEqual(arr, [3, 4, 5, 6, 7, 8, 9]);
+  });
+
+  it("should support range walking with both keys out of range", () => {
     const tree = new Tree();
     for (let i = 0; i < 10; i++) tree.insert(i);
 
