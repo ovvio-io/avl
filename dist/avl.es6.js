@@ -258,6 +258,10 @@
       this._noDuplicates = !!noDuplicates;
     }
 
+    get comparator() {
+      return this._comparator;
+    }
+
     /**
      * Clear the tree
      * @return {AVLTree}

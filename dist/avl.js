@@ -247,7 +247,11 @@
     this._noDuplicates = !!noDuplicates;
   };
 
-  var prototypeAccessors = { size: { configurable: true } };
+  var prototypeAccessors = { comparator: { configurable: true },size: { configurable: true } };
+
+  prototypeAccessors.comparator.get = function () {
+    return this._comparator;
+  };
 
   /**
    * Clear the tree

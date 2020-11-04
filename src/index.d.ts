@@ -17,6 +17,7 @@ export type TraverseCallback<Key, Value> = (
 
 export default class AVLTree<Key extends any, Value extends any> {
   constructor(comparator?: Comparator<Key>, noDuplicates?: boolean);
+  readonly comparator: Comparator<Key>;
   size: number;
   insert(key: Key, data?: Value): void;
   remove(key: Key): Node<Key, Value>;
