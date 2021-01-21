@@ -1,20 +1,24 @@
-import { describe, it } from 'mocha';
-import { assert }       from 'chai';
+import { describe, it } from "mocha";
+import { assert } from "chai";
 
-import Tree from '../src/index';
+import Tree from "../src/index";
 
-
-describe ('remove', () => {
-
-  it('should not change the size of a tree with no root', () => {
+describe("remove", () => {
+  it("should not change the size of a tree with no root", () => {
     const tree = new Tree();
+    const v1 = tree.version;
     tree.remove(1);
+    assert.equal(tree.version, v1);
+
     assert.equal(tree.size, 0);
   });
 
-  it('should remove a single key', () => {
+  it("should remove a single key", () => {
     const tree = new Tree();
+    const v1 = tree.version;
+
     tree.insert(1);
+    assert.isTrue(tree.version > v1);
     tree.remove(1);
     assert.isTrue(tree.isEmpty());
   });
@@ -26,7 +30,7 @@ describe ('remove', () => {
    *    / \                             /
    *   1   3                           3
    */
-  it('should correctly balance the left left case', () => {
+  it("should correctly balance the left left case", () => {
     const tree = new Tree();
     tree.insert(4);
     tree.insert(2);
@@ -51,7 +55,7 @@ describe ('remove', () => {
    *          / \                   \
    *         5   7                  5
    */
-  it('should correctly balance the right right case', () => {
+  it("should correctly balance the right right case", () => {
     const tree = new Tree();
     tree.insert(4);
     tree.insert(2);
@@ -78,7 +82,7 @@ describe ('remove', () => {
    *      / \
    *     3   5
    */
-  it('should correctly balance the left right case', () => {
+  it("should correctly balance the left right case", () => {
     const tree = new Tree();
     tree.insert(6);
     tree.insert(2);
@@ -107,7 +111,7 @@ describe ('remove', () => {
    *        / \
    *       4   6
    */
-  it('should correctly balance the right left case', () => {
+  it("should correctly balance the right left case", () => {
     const tree = new Tree();
     tree.insert(3);
     tree.insert(2);
@@ -127,7 +131,7 @@ describe ('remove', () => {
     assert.equal(tree._root.right.right.key, 8);
   });
 
-  it('should take the right child if the left does not exist', () => {
+  it("should take the right child if the left does not exist", () => {
     const tree = new Tree();
     tree.insert(1);
     tree.insert(2);
@@ -135,7 +139,7 @@ describe ('remove', () => {
     assert.equal(tree._root.key, 2);
   });
 
-  it('should take the left child if the right does not exist', () => {
+  it("should take the left child if the right does not exist", () => {
     const tree = new Tree();
     tree.insert(2);
     tree.insert(1);
@@ -143,7 +147,7 @@ describe ('remove', () => {
     assert.equal(tree._root.key, 1);
   });
 
-  it('should get the right child if the node has 2 leaf children', () => {
+  it("should get the right child if the node has 2 leaf children", () => {
     const tree = new Tree();
     tree.insert(2);
     tree.insert(1);
@@ -152,7 +156,7 @@ describe ('remove', () => {
     assert.equal(tree._root.key, 1);
   });
 
-  it('should get the in-order successor if the node has both children', () => {
+  it("should get the in-order successor if the node has both children", () => {
     const tree = new Tree();
     tree.insert(2);
     tree.insert(1);
@@ -162,5 +166,4 @@ describe ('remove', () => {
     tree.remove(2);
     assert.equal(tree._root.key, 4);
   });
-
 });

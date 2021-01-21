@@ -128,10 +128,15 @@ export default class AVLTree {
     this._root = null;
     this._size = 0;
     this._noDuplicates = !!noDuplicates;
+    this._version = 0;
   }
 
   get comparator() {
     return this._comparator;
+  }
+
+  get version() {
+    return this._version;
   }
 
   /**
@@ -149,6 +154,7 @@ export default class AVLTree {
   clear() {
     this._root = null;
     this._size = 0;
+    this._version++;
     return this;
   }
 
@@ -533,6 +539,7 @@ export default class AVLTree {
         data,
       };
       this._size++;
+      this._version++;
       return this._root;
     }
 
@@ -598,6 +605,7 @@ export default class AVLTree {
     }
 
     this._size++;
+    this._version++;
     return newNode;
   }
 
@@ -702,6 +710,7 @@ export default class AVLTree {
     if (node === this._root) this._root = null;
 
     this._size--;
+    this._version++;
     return returnValue;
   }
 
@@ -718,6 +727,7 @@ export default class AVLTree {
     this._root = loadRecursive(null, keys, values, 0, size);
     markBalance(this._root);
     this._size = size;
+    this._version++;
     return this;
   }
 

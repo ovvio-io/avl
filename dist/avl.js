@@ -1,5 +1,5 @@
 /**
- * @ovvio/avl v2.0.0
+ * @ovvio/avl v2.1.0
  * Fast AVL tree for Node and browser
  *
  * @author Alexander Milevski <info@w8r.name>
@@ -245,12 +245,17 @@
     this._root = null;
     this._size = 0;
     this._noDuplicates = !!noDuplicates;
+    this._version = 0;
   };
 
-  var prototypeAccessors = { comparator: { configurable: true },size: { configurable: true } };
+  var prototypeAccessors = { comparator: { configurable: true },version: { configurable: true },size: { configurable: true } };
 
   prototypeAccessors.comparator.get = function () {
     return this._comparator;
+  };
+
+  prototypeAccessors.version.get = function () {
+    return this._version;
   };
 
   /**
@@ -268,6 +273,7 @@
   AVLTree.prototype.clear = function clear () {
     this._root = null;
     this._size = 0;
+    this._version++;
     return this;
   };
 
@@ -658,6 +664,7 @@
         data: data,
       };
       this._size++;
+      this._version++;
       return this._root;
     }
 
@@ -723,6 +730,7 @@
     }
 
     this._size++;
+    this._version++;
     return newNode;
   };
 
@@ -829,6 +837,7 @@
     if (node === this._root) { this._root = null; }
 
     this._size--;
+    this._version++;
     return returnValue;
   };
 
@@ -848,6 +857,7 @@
     this._root = loadRecursive(null, keys, values, 0, size);
     markBalance(this._root);
     this._size = size;
+    this._version++;
     return this;
   };
 
